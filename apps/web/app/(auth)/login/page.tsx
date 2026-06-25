@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { AuthForm } from '@/components/auth/AuthForm'
 
 export const metadata: Metadata = {
-  title: 'Sign In — TalentVault',
+  title: 'Sign In — HumanSkillMap (HSM)',
 }
 
 export default function LoginPage() {
@@ -12,7 +12,7 @@ export default function LoginPage() {
       <div>
         <h2 className="text-xl font-semibold text-foreground">Welcome back</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Enter your mobile or email to receive a one-time password.
+          Enter your email to receive a one-time password.
         </p>
       </div>
 

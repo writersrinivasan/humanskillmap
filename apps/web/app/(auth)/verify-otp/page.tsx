@@ -67,7 +67,7 @@ function VerifyOTPContent() {
           return
         }
 
-        toast.success('Verified! Welcome to TalentVault.')
+        toast.success('Verified! Welcome to HumanSkillMap (HSM).')
         router.push(next)
         router.refresh()
       } catch {
@@ -129,6 +129,7 @@ function VerifyOTPContent() {
       {/* OTP Input */}
       <div className="flex flex-col items-center gap-4">
         <OTPInput
+          length={OTP_LENGTH}
           value={otp}
           onChange={setOtp}
           onComplete={verifyOTP}

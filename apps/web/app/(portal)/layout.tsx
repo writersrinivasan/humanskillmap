@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { UserIcon, UploadIcon, LayoutDashboardIcon, LogOutIcon } from 'lucide-react'
+import { HSMLogo } from '@/components/ui/HSMLogo'
 
 export default async function PortalLayout({
   children,
@@ -15,7 +16,6 @@ export default async function PortalLayout({
 
   if (!user) redirect('/login')
 
-  // Fetch user role for admin nav link
   const { data: userRow } = await supabase
     .from('users')
     .select('role')
@@ -25,18 +25,16 @@ export default async function PortalLayout({
   const isAdmin = userRow?.role === 'admin' || userRow?.role === 'super_admin'
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Top Nav */}
-      <header className="sticky top-0 z-40 w-full border-b bg-white/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-40 w-full border-b bg-card/80 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4">
           <Link
             href="/"
             className="flex items-center gap-2 font-bold text-foreground"
           >
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-white">
-              T
-            </span>
-            TalentVault
+            <HSMLogo size={30} />
+            <span className="text-sm font-semibold">HumanSkillMap</span>
           </Link>
 
           <nav className="flex items-center gap-1">

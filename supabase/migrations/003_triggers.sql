@@ -154,7 +154,12 @@ $$;
 
 DROP TRIGGER IF EXISTS recompute_on_profile_change ON public.profiles;
 CREATE TRIGGER recompute_on_profile_change
-  AFTER INSERT OR UPDATE ON public.profiles
+  AFTER INSERT OR UPDATE OF
+    full_name, headline, city, state, summary,
+    linkedin_url, github_url, portfolio_url,
+    salary_exp_min, salary_exp_max,
+    availability_status, notice_period_days
+  ON public.profiles
   FOR EACH ROW EXECUTE FUNCTION public.trg_recompute_completion();
 
 DROP TRIGGER IF EXISTS recompute_on_skill_change ON public.skills;

@@ -11,8 +11,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'TalentVault — Upload your resume in 60 seconds',
-    template: '%s | TalentVault',
+    default: 'HumanSkillMap (HSM) — Upload your resume in 60 seconds',
+    template: '%s | HumanSkillMap (HSM)',
   },
   description:
     'The fastest way to get discovered by top recruiters. Upload your resume in under 60 seconds.',

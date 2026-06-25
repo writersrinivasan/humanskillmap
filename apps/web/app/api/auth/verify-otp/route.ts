@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { verifyOtpSchema } from '@/lib/validations/auth'
-import { toE164Phone } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,33 +14,40 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
     const { type, value, token } = parsed.data
-
-    let verifyResult
+    const svc = createServiceClient() as any
 
     if (type === 'phone') {
-      verifyResult = await supabase.auth.verifyOtp({
-        phone: toE164Phone(value),
-        token,
-        type: 'sms',
-      })
-    } else {
-      verifyResult = await supabase.auth.verifyOtp({
-        email: value,
-        token,
-        type: 'email',
-      })
+      return NextResponse.json({ error: 'Phone OTP not supported' }, { status: 400 })
     }
+
+    // Look up stored hashed_token for this email + OTP
+    const { data: otpRow, error: lookupErr } = await svc
+      .from('email_otps')
+      .select('hashed_token, expires_at')
+      .eq('email', value)
+      .eq('otp', token)
+      .single()
+
+    if (lookupErr || !otpRow) {
+      return NextResponse.json({ error: 'Invalid or expired OTP.' }, { status: 401 })
+    }
+
+    if (new Date(otpRow.expires_at) < new Date()) {
+      await svc.from('email_otps').delete().eq('email', value)
+      return NextResponse.json({ error: 'OTP has expired. Please request a new one.' }, { status: 401 })
+    }
+
+    // Verify session using hashed_token (reliable path)
+    const supabase = await createClient()
+    const verifyResult = await supabase.auth.verifyOtp({
+      token_hash: otpRow.hashed_token,
+      type: 'magiclink',
+    })
 
     if (verifyResult.error) {
       console.error('[verify-otp] Supabase error:', verifyResult.error.message)
-      const isInvalid = verifyResult.error.message.toLowerCase().includes('invalid')
-        || verifyResult.error.message.toLowerCase().includes('expired')
-      return NextResponse.json(
-        { error: isInvalid ? 'Invalid or expired OTP.' : 'Verification failed.' },
-        { status: isInvalid ? 401 : 500 }
-      )
+      return NextResponse.json({ error: 'Verification failed. Please request a new OTP.' }, { status: 401 })
     }
 
     const { user, session } = verifyResult.data
@@ -50,19 +56,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Verification failed.' }, { status: 500 })
     }
 
-    // Ensure public.users row exists (trigger handles this, but upsert as safety net)
-    const svc = createServiceClient()
-    await svc
-      .from('users')
-      .upsert(
-        {
-          id: user.id,
-          email: user.email ?? null,
-          phone: user.phone ?? null,
-          last_login_at: new Date().toISOString(),
-        },
-        { onConflict: 'id' }
-      )
+    // Clean up used OTP
+    await svc.from('email_otps').delete().eq('email', value)
+
+    // Ensure public.users row exists
+    await svc.from('users').upsert(
+      {
+        id: user.id,
+        email: user.email ?? null,
+        phone: user.phone ?? null,
+        last_login_at: new Date().toISOString(),
+      },
+      { onConflict: 'id' }
+    )
 
     // Audit log
     await svc.from('audit_logs').insert({
@@ -78,9 +84,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, user: { id: user.id } })
   } catch (err) {
     console.error('[verify-otp] Unexpected error:', err)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

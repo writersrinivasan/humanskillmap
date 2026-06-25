@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { HSMLogo } from '@/components/ui/HSMLogo'
 
 export const metadata: Metadata = {
   title: 'Sign In',
@@ -10,21 +11,21 @@ export default function AuthLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-violet-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#F5EFE4] via-[#FAF7F0] to-[#EEF5F0] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo / Brand */}
         <div className="mb-8 text-center">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary mb-4">
-            <span className="text-2xl font-bold text-white">T</span>
+          <div className="inline-flex items-center justify-center mb-4">
+            <HSMLogo size={52} />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">TalentVault</h1>
+          <h1 className="text-2xl font-bold text-foreground">HumanSkillMap</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Get discovered by top recruiters
           </p>
         </div>
 
         {/* Auth Card */}
-        <div className="rounded-2xl border bg-card shadow-lg p-6 sm:p-8">
+        <div className="rounded-2xl border bg-card shadow-lg shadow-stone-200/60 p-6 sm:p-8">
           {children}
         </div>
 

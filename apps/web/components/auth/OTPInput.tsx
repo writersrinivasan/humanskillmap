@@ -32,7 +32,7 @@ export function OTPInput({
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-      const char = e.target.value.replace(/\D/g, '').slice(-1)
+      const char = e.target.value.slice(-1)
       const chars = value.split('')
       chars[index] = char
 
@@ -54,12 +54,10 @@ export function OTPInput({
     (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
       if (e.key === 'Backspace') {
         if (value[index]) {
-          // Clear current
           const chars = value.split('')
           chars[index] = ''
           onChange(chars.join(''))
         } else if (index > 0) {
-          // Move back
           const chars = value.split('')
           chars[index - 1] = ''
           onChange(chars.join(''))
@@ -80,7 +78,7 @@ export function OTPInput({
   const handlePaste = useCallback(
     (e: React.ClipboardEvent) => {
       e.preventDefault()
-      const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, length)
+      const pasted = e.clipboardData.getData('text').trim().slice(0, length)
       if (!pasted) return
       onChange(pasted.padEnd(length, '').slice(0, length))
       if (pasted.length === length) {
@@ -101,16 +99,15 @@ export function OTPInput({
           ref={(el) => { inputsRef.current[i] = el }}
           type="text"
           inputMode="numeric"
-          pattern="\d*"
           maxLength={1}
           value={value[i] ?? ''}
           onChange={(e) => handleChange(e, i)}
           onKeyDown={(e) => handleKeyDown(e, i)}
           onFocus={(e) => e.target.select()}
           disabled={disabled}
-          aria-label={`OTP digit ${i + 1}`}
+          aria-label={`OTP character ${i + 1}`}
           className={cn(
-            'h-12 w-12 rounded-lg border-2 text-center text-xl font-semibold transition-colors',
+            'h-12 w-12 rounded-lg border-2 text-center text-xl font-semibold uppercase transition-colors',
             'focus:outline-none focus:ring-0',
             'sm:h-14 sm:w-14 sm:text-2xl',
             error

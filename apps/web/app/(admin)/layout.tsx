@@ -1,12 +1,8 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import {
-  LayoutDashboardIcon,
-  UsersIcon,
-  SearchIcon,
-  LogOutIcon,
-} from 'lucide-react'
+import { LayoutDashboardIcon, UsersIcon, SearchIcon, LogOutIcon } from 'lucide-react'
+import { HSMLogo } from '@/components/ui/HSMLogo'
 
 export default async function AdminLayout({
   children,
@@ -31,15 +27,13 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Sidebar */}
+    <div className="min-h-screen bg-background">
       <div className="flex">
-        <aside className="fixed inset-y-0 left-0 z-50 hidden w-56 flex-col border-r bg-white lg:flex">
-          <div className="flex h-14 items-center border-b px-4">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-white">
-              T
-            </span>
-            <span className="ml-2 font-bold text-sm">TalentVault Admin</span>
+        {/* Sidebar */}
+        <aside className="fixed inset-y-0 left-0 z-50 hidden w-56 flex-col border-r bg-card lg:flex">
+          <div className="flex h-14 items-center gap-2.5 border-b px-4">
+            <HSMLogo size={28} />
+            <span className="font-semibold text-sm leading-tight">HSM Admin</span>
           </div>
 
           <nav className="flex-1 space-y-1 p-3">
@@ -80,8 +74,9 @@ export default async function AdminLayout({
         </aside>
 
         {/* Mobile header */}
-        <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center border-b bg-white px-4 lg:hidden">
-          <span className="font-bold text-sm">TalentVault Admin</span>
+        <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-2.5 border-b bg-card px-4 lg:hidden">
+          <HSMLogo size={26} />
+          <span className="font-semibold text-sm">HSM Admin</span>
           <nav className="ml-auto flex items-center gap-1">
             <Link href="/admin/dashboard" className="rounded px-2 py-1 text-xs text-muted-foreground hover:bg-accent">
               Dashboard

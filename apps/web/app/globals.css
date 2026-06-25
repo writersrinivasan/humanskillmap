@@ -4,39 +4,42 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    /* ── Warm cream base ── */
+    --background: 38 35% 96%;          /* #F9F5EE — warm cream */
+    --foreground: 28 20% 11%;          /* #1C1712 — warm near-black */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: 36 40% 99%;                /* #FDFAF5 — off-white card */
+    --card-foreground: 28 20% 11%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 36 40% 99%;
+    --popover-foreground: 28 20% 11%;
 
-    --primary: 238 84% 57%;
-    --primary-foreground: 210 40% 98%;
+    /* ── Primary: forest green ── */
+    --primary: 158 41% 30%;            /* #2D6A4F */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 214 32% 91%;
-    --secondary-foreground: 222 47% 11%;
+    /* ── Secondary / accents ── */
+    --secondary: 38 28% 90%;           /* #EDE5D6 — warm beige */
+    --secondary-foreground: 28 20% 11%;
 
-    --muted: 214 32% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 38 22% 92%;               /* #EFE9DC — light warm beige */
+    --muted-foreground: 30 8% 46%;     /* #7A7166 — warm mid-gray */
 
-    --accent: 214 32% 96%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 38 28% 90%;
+    --accent-foreground: 28 20% 11%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 238 84% 57%;
+    --border: 36 18% 85%;              /* #DDD5C7 — warm border */
+    --input: 36 18% 85%;
+    --ring: 158 41% 30%;
 
     --radius: 0.625rem;
 
     /* Upload progress */
-    --progress-bg: 214 32% 91%;
-    --progress-fill: 238 84% 57%;
+    --progress-bg: 38 22% 88%;
+    --progress-fill: 158 41% 30%;
   }
 
   * {
@@ -49,22 +52,20 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Smooth scroll */
   html {
     scroll-behavior: smooth;
   }
 
-  /* Better focus rings */
   :focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 
-  /* Input autofill */
+  /* Input autofill — match cream background */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 30px white inset !important;
-    -webkit-text-fill-color: hsl(222 47% 11%) !important;
+    -webkit-box-shadow: 0 0 0 30px hsl(36 40% 99%) inset !important;
+    -webkit-text-fill-color: hsl(28 20% 11%) !important;
   }
 }
 
@@ -73,17 +74,14 @@
     text-wrap: balance;
   }
 
-  /* Gradient text */
   .gradient-text {
-    @apply bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent;
   }
 
-  /* Card hover */
   .card-hover {
     @apply transition-shadow duration-200 hover:shadow-md;
   }
 
-  /* Hide scrollbar but keep scroll */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
