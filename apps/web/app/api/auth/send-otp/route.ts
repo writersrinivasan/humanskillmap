@@ -26,7 +26,6 @@ export async function POST(request: NextRequest) {
     const { data, error } = await admin.auth.admin.generateLink({
       type: 'magiclink',
       email: value,
-      options: { shouldCreateUser: true },
     })
 
     if (error || !data?.properties?.email_otp) {
