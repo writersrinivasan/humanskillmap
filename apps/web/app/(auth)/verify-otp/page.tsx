@@ -68,8 +68,7 @@ function VerifyOTPContent() {
         }
 
         toast.success('Verified! Welcome to HumanSkillMap (HSM).')
-        router.push(next)
-        router.refresh()
+        window.location.href = next
       } catch {
         setHasError(true)
         toast.error('Something went wrong. Please try again.')
