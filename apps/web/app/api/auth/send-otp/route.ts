@@ -29,8 +29,11 @@ export async function POST(request: NextRequest) {
     })
 
     if (error || !data?.properties?.email_otp) {
-      console.error('[send-otp] generateLink error:', error?.name, error?.message)
-      return NextResponse.json({ error: 'Failed to generate OTP' }, { status: 500 })
+      console.error('[send-otp] generateLink error:', error?.name, error?.message, error?.status)
+      return NextResponse.json({
+        error: 'Failed to generate OTP',
+        detail: error?.message ?? 'no email_otp in response',
+      }, { status: 500 })
     }
 
     const { hashed_token } = data.properties
