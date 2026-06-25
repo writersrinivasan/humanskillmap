@@ -53,34 +53,19 @@ function VerifyOTPContent() {
       setHasError(false)
 
       try {
-        // Step 1: validate OTP server-side, get hashed_token back
-        const res = await fetch('/api/auth/verify-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type, value, token }),
-        })
-
-        const data = await res.json()
-
-        if (!res.ok) {
-          setHasError(true)
-          setOtp('')
-          toast.error(data.error ?? 'Invalid OTP. Please try again.')
-          return
-        }
-
-        // Step 2: verify with Supabase from the browser so it stores the
-        // session in cookies natively — no manual cookie transfer needed
+        // Verify OTP directly from the browser — Supabase stores the session
+        // in cookies automatically, so middleware sees it on the next request
         const supabase = createClient()
         const { error: verifyErr } = await supabase.auth.verifyOtp({
-          token_hash: data.hashed_token,
-          type: 'magiclink',
+          email: value,
+          token,
+          type: 'email',
         })
 
         if (verifyErr) {
           setHasError(true)
           setOtp('')
-          toast.error('Verification failed. Please request a new OTP.')
+          toast.error(verifyErr.message ?? 'Invalid OTP. Please try again.')
           return
         }
 
