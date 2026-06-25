@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
+import { createServiceClient } from '@/lib/supabase/server'
 import { verifyOtpSchema } from '@/lib/validations/auth'
+import type { Database } from '@/types/database'
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,11 +37,30 @@ export async function POST(request: NextRequest) {
 
     if (new Date(otpRow.expires_at) < new Date()) {
       await svc.from('email_otps').delete().eq('email', value)
-      return NextResponse.json({ error: 'OTP has expired. Please request a new one.' }, { status: 401 })
+      return NextResponse.json(
+        { error: 'OTP has expired. Please request a new one.' },
+        { status: 401 }
+      )
     }
 
-    // Verify session using hashed_token (reliable path)
-    const supabase = await createClient()
+    // Collect cookies Supabase wants to set
+    const pendingCookies: Array<{ name: string; value: string; options: Record<string, unknown> }> = []
+
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach((c) => pendingCookies.push(c as typeof pendingCookies[0]))
+          },
+        },
+      }
+    )
+
     const verifyResult = await supabase.auth.verifyOtp({
       token_hash: otpRow.hashed_token,
       type: 'magiclink',
@@ -47,7 +68,10 @@ export async function POST(request: NextRequest) {
 
     if (verifyResult.error) {
       console.error('[verify-otp] Supabase error:', verifyResult.error.message)
-      return NextResponse.json({ error: 'Verification failed. Please request a new OTP.' }, { status: 401 })
+      return NextResponse.json(
+        { error: 'Verification failed. Please request a new OTP.' },
+        { status: 401 }
+      )
     }
 
     const { user, session } = verifyResult.data
@@ -81,7 +105,13 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({ success: true, user: { id: user.id } })
+    // Build response and attach session cookies so browser persists the session
+    const response = NextResponse.json({ success: true, user: { id: user.id } })
+    pendingCookies.forEach(({ name, value: val, options }) => {
+      response.cookies.set(name, val, options as Parameters<typeof response.cookies.set>[2])
+    })
+
+    return response
   } catch (err) {
     console.error('[verify-otp] Unexpected error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
