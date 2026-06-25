@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 
 import { OTPInput } from '@/components/auth/OTPInput'
 import { Button } from '@/components/ui/button'
+import { createClient } from '@/lib/supabase/client'
 
 const OTP_LENGTH = 6
 const RESEND_SECONDS = 60
@@ -52,6 +53,7 @@ function VerifyOTPContent() {
       setHasError(false)
 
       try {
+        // Step 1: validate OTP server-side, get hashed_token back
         const res = await fetch('/api/auth/verify-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -64,6 +66,21 @@ function VerifyOTPContent() {
           setHasError(true)
           setOtp('')
           toast.error(data.error ?? 'Invalid OTP. Please try again.')
+          return
+        }
+
+        // Step 2: verify with Supabase from the browser so it stores the
+        // session in cookies natively — no manual cookie transfer needed
+        const supabase = createClient()
+        const { error: verifyErr } = await supabase.auth.verifyOtp({
+          token_hash: data.hashed_token,
+          type: 'magiclink',
+        })
+
+        if (verifyErr) {
+          setHasError(true)
+          setOtp('')
+          toast.error('Verification failed. Please request a new OTP.')
           return
         }
 
